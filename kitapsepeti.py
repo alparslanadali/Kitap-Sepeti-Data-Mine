@@ -38,37 +38,43 @@ class Kitap_Sepeti():
     def MineData(self,url):
         "That fonk. going to website and mine all data"
 
-        r = requests.get(url) # site belirleniyor
-        rr=r.content # site kaynağı çekilerek bir değişkene atıyorum
+        getc = requests.get(url) # determining the site
+        contentc=getc.content # pulling the site source and assigning it to a variable
         #print(rr)
-        soup = BeautifulSoup(rr,"html.parser") # bu kaynaktaki tüm html kodlarını alıyorum
-        a = soup.find_all("div",{"class":"col col-3 col-md-4 col-sm-6 col-xs-6 p-right mb productItem zoom ease"}) #html kodlarını sadeleştiriyorum 
-        list = [] # boş bir liste atıyorum
-        for ass in a: # site kodları içinde gezinerek sadeleşmiş kaynağı düzenliyorum
-        #ass.get("href")
-            test = str(ass.text) # düzenleme işlemi için sayfa kaynağını text ve str olarak alıyorum
-            if test[0] != "<": # kaynak sadeleştiriyorum
-                a=test.split("\n") # boşluklar için yine sadeleştiriyorum
-                for i in a: # sadece kitap ismi , yayın evi ismi, yazar ve kitap fiyatını alıyorum.
-                    if (len(i)>3 and i !="Sepete Ekle" ): # yine sadeleştiriyorum. 
+
+        soup = BeautifulSoup(contentc,"html.parser") # I get all html codes from this source
+        html = soup.find_all("div",{"class":"col col-3 col-md-4 col-sm-6 col-xs-6 p-right mb productItem zoom ease"}) #simplifying html codes 
+        
+        list = [] # I'm throwing an empty list
+        
+        for code in html: # I edit the simplified source by navigating through the site code
+        #code.get("href")
+            test = str(code.text) # I get the page source as text and str for the editing process
+
+            if test[0] != "<": # simplifying the source
+                a=test.split("\n") # simplifying again for the gaps
+
+                for i in a: # I only get the book title, publishing house name, author and book price.
+
+                    if (len(i)>3 and i !="Sepete Ekle" ): # again simplifying the source
                         list.append(i)
                         #print(i)
 
-        gruplar = [list[i:i+4] for i in range(0,len(list),4)]
-        return gruplar
+        groups = [list[i:i+4] for i in range(0,len(list),4)]
+        return groups
     
     def Mining(self):
         "That fonk. going to website and mine all data"
 
         browser = self.Browser()
-        for i in range(11): #Kitap türlerine giden sayfaları gezmek için
+        for i in range(11): #To navigate pages to book genres
 
             url = self.Mine_Url(i)
             self.Go_to_url(browser=browser,url=url)
             time.sleep(2)
-            browser.find_element(By.XPATH,"//*[@id='filtreStock']/div/div/div/div/label").click() #stokta olanları işaretliyor
+            browser.find_element(By.XPATH,"//*[@id='filtreStock']/div/div/div/div/label").click() #marking what is in stock
             time.sleep(1)
-            total_pagenum=browser.find_element(By.XPATH,"//*[@id='pager-wrapper-top']/div/div/a[10]").text #son sayfayı alıyor.
+            total_pagenum=browser.find_element(By.XPATH,"//*[@id='pager-wrapper-top']/div/div/a[10]").text #taking last page
             time.sleep(2)
 
             for i in range(1,int(total_pagenum)):
@@ -99,5 +105,6 @@ class Kitap_Sepeti():
         
 
 
-    
+        
+
 Kitap_Sepeti().Mining()
